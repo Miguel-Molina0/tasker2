@@ -1,9 +1,5 @@
 from rest_framework import serializers
-<<<<<<< HEAD
-from django.db.models import Avg
-=======
 from django.db.models import Avg, Q
->>>>>>> 94da046 (Fiz o calendário e a api pagamento)
 from .models import Categoria, Contratacao, Mensagem, Servico, Usuario, Anuncio, Pagamento, Chat, Calendario, Avaliacao
 
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -34,8 +30,6 @@ class AnuncioSerializer(serializers.ModelSerializer):
 
     
 class CategoriaSerializer(serializers.ModelSerializer):
-<<<<<<< HEAD
-=======
     distancia_km = serializers.DecimalField(
         max_digits=5, 
         decimal_places=2, 
@@ -71,12 +65,9 @@ class ContratacaoSerializer(serializers.ModelSerializer):
             'anuncio_titulo', 
             'prestador_id',
             'st_status', 
-<<<<<<< HEAD
-=======
             'dt_agendamento', 
             'hr_inicio', 
             'hr_final',
->>>>>>> 94da046 (Fiz o calendário e a api pagamento)
             'dt_criacao', 
             'dt_atualizacao'
         ]
@@ -88,11 +79,7 @@ class ContratacaoSerializer(serializers.ModelSerializer):
 
         if anuncio and anuncio.usuario == user:
             raise serializers.ValidationError("Você não pode contratar o seu próprio serviço.")
-<<<<<<< HEAD
         return data
-
-
-=======
 
         dt_agendamento = data.get('dt_agendamento')
         hr_inicio = data.get('hr_inicio')
@@ -122,7 +109,7 @@ class ContratacaoSerializer(serializers.ModelSerializer):
                 )
 
         return data
->>>>>>> 94da046 (Fiz o calendário e a api pagamento)
+
 class PagamentoSerializer(serializers.ModelSerializer):
     status_contratacao = serializers.CharField(source='fk_id_contratacao.st_status', read_only=True)
 
