@@ -7,13 +7,9 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q  
-<<<<<<< HEAD
-
-=======
 from .tasks import enviar_email_noticacao, enviar_push_fcm
 from .asaas import AsaasService
 from rest_framework.views import APIView
->>>>>>> 94da046 (Fiz o calendário e a api pagamento)
 from .models import Calendario, Avaliacao, Mensagem, Pagamento, Chat, Categoria, Usuario, Anuncio, Servico, Contratacao
 from .serializers import (
     MensagemSerializer, CalendarioSerializer, CategoriaSerializer, UsuarioSerializer, 
@@ -23,16 +19,12 @@ from .serializers import (
 from .permission import IsParticipanteContratacao
 from .filters import AnuncioFilter
 from .pagination import AnuncioPagination
-<<<<<<< HEAD
 from  asgiref.sync import import async_to_sync
 from channels.layers import get_channel_layer
-=======
 from  asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from rest_framework.views import APIView
 from django.utils import timezone
->>>>>>> 94da046 (Fiz o calendário e a api pagamento)
-
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -137,67 +129,52 @@ class ContratacaoViewSet(viewsets.ModelViewSet):
             Q(fk_id_cliente=user) | Q(fk_id_anuncio__usuario=user)
         ).order_by('-dt_criacao')
 
-<<<<<<< HEAD
     def perform_create(self, serializer):
         serializer.save(fk_id_cliente=self.request.user)
-=======
+        
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
+        
     def perform_create(self, serializer):
         contratacao = serializer.save(fk_id_cliente=self.request.user)
         cliente = self.request.user
         asaas = AsaasService()
 
-        # 1. Garante que o cliente possui ID no Asaas
         if not cliente.asaas_customer_id:
             asaas_cliente = asaas.criar_cliente(cliente)
             cliente.asaas_customer_id = asaas_cliente.get('id')
             cliente.save()
 
-        # 2. Cria cobrança referente ao valor do anúncio
         cobranca = asaas.criar_cobranca(
             cliente_id_asaas=cliente.asaas_customer_id,
             valor=contratacao.fk_id_anuncio.vl_preco,
             descricao=f"Contratação #{contratacao.id} - {contratacao.fk_id_anuncio.nm_titulo}"
         )
 
-        # 3. Registra o Pagamento em modo RETIDO
         Pagamento.objects.create(
             vl_servico=contratacao.fk_id_anuncio.vl_preco,
             st_pagamento='retido',
             fk_id_contratacao=contratacao,
             asaas_payment_id=cobranca.get('id')
         )
->>>>>>> 94da046 (Fiz o calendário e a api pagamento)
+
 
     @action(detail=True, methods=['patch'], url_path='aceitar')
     def aceitar(self, request, pk=None):
         contratacao = self.get_object()
-<<<<<<< HEAD
-=======
-        
->>>>>>> 94da046 (Fiz o calendário e a api pagamento)
+
         if contratacao.fk_id_anuncio.usuario != request.user:
             raise PermissionDenied("Apenas o prestador do serviço pode aceitar esta contratação.")
         
         if contratacao.st_status != 'PENDENTE':
             raise ValidationError(f"Não é possível aceitar uma contratação com status '{contratacao.st_status}'.")
-
-<<<<<<< HEAD
-        contratacao.st_status = 'ACEITO'
-        contratacao.save()
-        return Response({'status': 'Contratação aceita com sucesso!', 'dados': self.get_serializer(contratacao).data})
-
-=======
-        # 1. Altera o status da contratação
+ 
         contratacao.st_status = 'ACEITO'
         contratacao.save()
 
-        # 2. AUTOMAÇÃO: Cria o evento no calendário para ambos os envolvidos
         if contratacao.dt_agendamento and contratacao.hr_inicio and contratacao.hr_final:
-            # Agendamento na agenda do Prestador
             Calendario.objects.create(
                 dt_agendamento=contratacao.dt_agendamento,
                 hr_inicio=contratacao.hr_inicio,
@@ -207,7 +184,6 @@ class ContratacaoViewSet(viewsets.ModelViewSet):
                 fk_id_contratacao=contratacao
             )
 
-            # Agendamento na agenda do Cliente
             Calendario.objects.create(
                 dt_agendamento=contratacao.dt_agendamento,
                 hr_inicio=contratacao.hr_inicio,
@@ -221,7 +197,6 @@ class ContratacaoViewSet(viewsets.ModelViewSet):
             'status': 'Contratação aceita e agendada automaticamente no calendário!',
             'dados': self.get_serializer(contratacao).data
         })
->>>>>>> 94da046 (Fiz o calendário e a api pagamento)
     @action(detail=True, methods=['patch'], url_path='recusar')
     def recusar(self, request, pk=None):
         contratacao = self.get_object()
@@ -246,7 +221,6 @@ class ContratacaoViewSet(viewsets.ModelViewSet):
         if contratacao.st_status != 'ACEITO':
             raise ValidationError("Apenas serviços com status 'ACEITO' podem ser concluídos.")
 
-<<<<<<< HEAD
         if user == contratacao.fk_id_cliente:
             contratacao.concluido_cliente = True
         elif user == contratacao.fk_id_anuncio.usuario:
@@ -256,7 +230,6 @@ class ContratacaoViewSet(viewsets.ModelViewSet):
         if contratacao.concluido_cliente and contratacao.concluido_prestador
             contratacao.st_status = 'CONCLUIDO'
             status_alterado = True
-=======
         outro_usuario = contratacao.fk_id_anuncio.usuario if user == contratacao.fk_id_cliente else contratacao.fk_id_cliente
 
         if user == contratacao.fk_id_cliente:
@@ -279,7 +252,6 @@ class ContratacaoViewSet(viewsets.ModelViewSet):
                 pagamento.st_pagamento = 'liberado'
                 pagamento.save()
 
->>>>>>> 94da046 (Fiz o calendário e a api pagamento)
         contratacao.save()
         
         channel_layer = get_channel_layer()
@@ -295,9 +267,9 @@ class ContratacaoViewSet(viewsets.ModelViewSet):
             }
         )
 
-<<<<<<< HEAD
+
         msg_retorno = "Serviço concluído!" if status_alertado else "Sua confirmação foi registrada. Aguardando a outra parte."
-=======
+
         assunto = f"Atualização na contratação #{contratacao.id}"
         if status_final:
             corpo_email = f"Olá {outro_usuario.username}, o serviço referente ao anúncio '{contratacao.fk_id_anuncio.nm_titulo}' foi concluído com sucesso! Você já pode realizar a avaliação do serviço."
@@ -314,15 +286,11 @@ class ContratacaoViewSet(viewsets.ModelViewSet):
             )
 
         msg_retorno = "Serviço concluído!" if status_final else "Sua confirmação foi registrada. Aguardando a outra parte."
->>>>>>> 94da046 (Fiz o calendário e a api pagamento)
+
         return Response({
             'status' : msg_retorno,
             'dados' : self.get_serializer(contratacao).data
         })
-<<<<<<< HEAD
-        
-
-=======
 
     @action(detail=True, methods=['patch'], url_path='cancelar')
     def cancelar(self, request, pk=None):
@@ -394,8 +362,6 @@ class AsaasWebhookView(APIView):
                 pagamento.save()
 
         return Response({'status': 'received'}, status=status.HTTP_200_OK)
->>>>>>> 94da046 (Fiz o calendário e a api pagamento)
-
 
 class MensagemViewSet(viewsets.ModelViewSet):
     serializer_class = MensagemSerializer
