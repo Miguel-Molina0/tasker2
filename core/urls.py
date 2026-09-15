@@ -5,7 +5,11 @@ from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
 
 from .views import (
+<<<<<<< HEAD
     CategoriaViewSet, MensagemViewSet, UsuarioViewSet, AnuncioViewSet, 
+=======
+    AsaasWebhookView, CategoriaViewSet, MensagemViewSet, UsuarioViewSet, AnuncioViewSet, 
+>>>>>>> 94da046 (Fiz o calendário e a api pagamento)
     ServicoViewSet, ContratacaoViewSet, PagamentoViewSet, CalendarioViewSet, 
     ChatViewSet, AvaliacaoViewSet
 )
@@ -24,6 +28,10 @@ router.register(r'mensagens', MensagemViewSet, basename='mensagem')
 
 urlpatterns = [
     path('', include(router.urls)),
+<<<<<<< HEAD
+=======
+    path('api/webhooks/asaas/', AsaasWebhookView.as_view(), name='asaas-webhook'),
+>>>>>>> 94da046 (Fiz o calendário e a api pagamento)
 ]
 
 if settings.DEBUG:

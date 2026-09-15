@@ -14,6 +14,12 @@ class Usuario(AbstractUser):
     ds_biografia = models.TextField(blank=True, null=True)
     tp_foto = models.ImageField(upload_to='perfis/', blank=True, null=True)
     id_tp_perfil = models.CharField(max_length=15, choices=PERFIL_CHOICES, default='contratante')
+<<<<<<< HEAD
+=======
+    fcm_token = models.CharField(max_length=255, blank=True, null=True)  
+    asaas_customer_id = models.CharField(max_length=80, blank=True, null=True)
+    chave_pix = models.CharField(max_length=100, blank=True, null=True)
+>>>>>>> 94da046 (Fiz o calendário e a api pagamento)
 
     def __str__(self):
         return self.username
@@ -74,7 +80,15 @@ class Contratacao(models.Model):
 
     dt_criacao = models.DateTimeField(auto_now_add=True)
     dt_atualizacao = models.DateTimeField(auto_now=True)
+<<<<<<< HEAD
 
+=======
+    dt_agendamento = models.DateField(null=True, blank=True)
+    hr_inicio = models.TimeField(null=True, blank=True)
+    hr_final = models.TimeField(null=True, blank=True)
+    nr_latitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    nr_longitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+>>>>>>> 94da046 (Fiz o calendário e a api pagamento)
     def __str__(self):
         return f"Contratação #{self.id} - {self.fk_id_anuncio.nm_titulo} ({self.st_status})"
 
@@ -90,7 +104,13 @@ class Pagamento(models.Model):
     st_pagamento = models.CharField(max_length=15, choices=STATUS_PAGAMENTO)
     dt_declaracao_pagamento = models.DateTimeField(blank=True, null=True)
     fk_id_contratacao = models.ForeignKey(Contratacao, on_delete=models.CASCADE)
+<<<<<<< HEAD
 
+=======
+    asaas_payment_id = models.CharField(max_length=100, blank=True, null=True)
+    pix_qr_code = models.TextField(blank=True, null=True)
+    pix_copia_cola = models.TextField(blank=True, null=True)
+>>>>>>> 94da046 (Fiz o calendário e a api pagamento)
 
 class Calendario(models.Model):
     dt_agendamento = models.DateField()

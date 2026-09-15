@@ -58,6 +58,9 @@ CHANNEL_LAYERS = {
     },
 }
 
+ASAAS_API_URL = "https://sandbox.asaas.com/api/v3" 
+ASAAS_API_KEY = "$aact_YTU5YTE0M2M2N2I4..."
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
